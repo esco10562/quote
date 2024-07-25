@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Estimator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #results {
+            margin-top: 20px;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .result-item span {
+            font-weight: bold;
+        }
+    </style>
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+</head>
+<body>
+    <div class="container">
+        <h1>Quote Estimator</h1>
+        <div class="input-group">
+            <label for="workers">Number of Workers:</label>
+            <input type="number" id="workers" min="1" value="1">
+        </div>
+        <div class="input-group">
+            <label for="days">Number of Days:</label>
+            <input type="number" id="days" min="1" value="1">
+        </div>
+        <div class="input-group">
+            <label for="materials">Cost of Materials ($):</label>
+            <input type="number" id="materials" min="0" value="0">
+        </div>
+        <button onclick="calculateAndDisplayQuote()">Calculate Quote</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function calculateQuote(workers, days, materials) {
+            const workerRate = 200;
+            const fernandoRate = 250;
+            const overheadPercentage = 0.25;
+            const profitPercentage = 0.20;
+
+            const fernandoPay = fernandoRate * days;
+            const laborCost = (workers * workerRate * days) + fernandoPay;
+            const totalCostMaterialsLabor = materials + laborCost;
+            const overheadCost = totalCostMaterialsLabor * overheadPercentage;
+            const totalCost = totalCostMaterialsLabor + overheadCost;
+            const profit = totalCost * profitPercentage;
+            const totalQuote = totalCost + profit;
+
+            return {
+                fernandoPay: fernandoPay.toFixed(2),
+                totalLaborCost: laborCost.toFixed(2),
+                totalCostMaterialsLabor: totalCostMaterialsLabor.toFixed(2),
+                overheadCost: overheadCost.toFixed(2),
+                totalCost: totalCost.toFixed(2),
+                profit: profit.toFixed(2),
+                totalQuote: totalQuote.toFixed(2)
+            };
+        }
+
+        function calculateAndDisplayQuote() {
+            const workers = parseInt(document.getElementById('workers').value);
+            const days = parseInt(document.getElementById('days').value);
+            const materials = parseFloat(document.getElementById('materials').value);
+
+            const quote = calculateQuote(workers, days, materials);
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="result-item"><span>Fernando's Pay:</span> $${quote.fernandoPay}</div>
+                <div class="result-item"><span>Total Labor Cost:</span> $${quote.totalLaborCost}</div>
+                <div class="result-item"><span>Total Cost (Materials + Labor):</span> $${quote.totalCostMaterialsLabor}</div>
+                <div class="result-item"><span>Overhead Cost:</span> $${quote.overheadCost}</div>
+                <div class="result-item"><span>Total Cost:</span> $${quote.totalCost}</div>
+                <div class="result-item"><span>Profit:</span> $${quote.profit}</div>
+                <div class="result-item"><span>Total Quote:</span> $${quote.totalQuote}</div>
+            `;
+        }
+    </script>
+</body>
+</html>
